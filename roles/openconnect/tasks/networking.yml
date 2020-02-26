@@ -1,6 +1,6 @@
 ---
 - name: enable ipv4 forwarding
-  sudo: yes
+  become: yes
   sysctl:
     name: "net.ipv4.ip_forward"
     value: 1
@@ -11,80 +11,76 @@
 
 
 - name: ensure firewalld disabled
-  sudo: yes
+  become: yes
   service:
     name: firewalld
     state: stopped
     enabled: no
 
 - name: ensure iptables-service installed
-  sudo: yes
+  become: yes
   yum:
     pkg: iptables-services
     state: installed
 
 - name: ensure iptables-service started
-  sudo: yes
+  become: yes
   service:
     name: iptables
     state: started
     enabled: yes
 
 - name: get iptables rules
-  sudo: yes
+  become: yes
   command: /sbin/iptables -L
   register: iptables_rules
-  always_run: yes
-  sudo: true
   tags:
     - opennconect
 
 - name: get iptables nat rules
-  sudo: yes
+  become: yes
   command: /sbin/iptables -L -t nat
   register: iptables_nat_rules
-  always_run: yes
-  sudo: true
   tags:
     - opennconect
 
 - name: add iptable rule for input tcp connection
-  sudo: yes
+  become: yes
   command: /sbin/iptables -I INPUT -p tcp --dport {{ openconnect_tcp_port }} -j ACCEPT -m comment --comment "VPN TCP input"
   when: iptables_rules.stdout.find("VPN TCP input") == -1
   tags:
     - opennconect
 
 - name: add iptable rule for input udp connection
-  sudo: yes
+  become: yes
   command: /sbin/iptables -I INPUT -p udp --dport {{ openconnect_tcp_port }} -j ACCEPT -m comment --comment "VPN UDP input"
   when: iptables_rules.stdout.find("VPN UDP input") == -1
   tags:
     - opennconect
 
 - name: add iptable rule for forwarding vpn traffic
-  sudo: yes
+  become: yes
   command: /sbin/iptables -I FORWARD -s {{ openconnect_int_net }}/{{ openconnect_int_mask }} -j ACCEPT  -m comment --comment "VPN forwarding"
   when: iptables_rules.stdout.find("VPN forwarding") == -1
   tags:
     - opennconect
 
 - name: add iptable rule for return vpn traffic
-  sudo: yes
+  become: yes
   command: /sbin/iptables -I FORWARD -d {{ openconnect_int_net }}/{{ openconnect_int_mask }} -j ACCEPT  -m comment --comment "VPN return forwarding"
   when: iptables_rules.stdout.find("VPN return forwarding") == -1
   tags:
     - opennconect
 
 - name: add iptable rule for vpn nat
-  sudo: yes
+  become: yes
   command: /sbin/iptables -t nat -I POSTROUTING -s {{ openconnect_int_net }}/{{ openconnect_int_mask }} -o {{ ansible_default_ipv4.interface }} -j MASQUERADE -m comment --comment "VPN NAT"
   when: iptables_nat_rules.stdout.find("VPN NAT") == -1
   tags:
     - opennconect
 
 - name: save iptables
-  sudo: yes
+  become: yes
   command: /usr/libexec/iptables/iptables.init save
   tags:
     - opennconect

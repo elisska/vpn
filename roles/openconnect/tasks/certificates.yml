@@ -1,5 +1,5 @@
 - name: copy ca certificate template
-  sudo: yes
+  become: yes
   template:
     src: ca.tmpl.j2
     dest: "{{ openconnect_ca_template }}"
@@ -11,7 +11,7 @@
     - openconnect
 
 - name: copy server certificate template
-  sudo: yes
+  become: yes
   template:
     src: server.tmpl.j2
     dest: "{{ openconnect_server_template }}"
@@ -33,7 +33,7 @@
   register: cert_file
 
 - name: copy certificate generation script
-  sudo: yes
+  become: yes
   template:
     src: gen_certs.sh.j2
     dest: "{{ openconnect_cert_gen_script }}"
@@ -44,7 +44,7 @@
     - openconnect
 
 - name: generate certificates
-  sudo: yes
+  become: yes
   command: "{{ openconnect_cert_gen_script }}"
   when: server_template.changed or ca_template.changed or not cert_file.stat.exists or not key_file.stat.exists
   notify: restart openconnect

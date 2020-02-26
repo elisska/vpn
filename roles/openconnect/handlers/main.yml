@@ -1,13 +1,13 @@
 ---
 
 - name: restart openconnect
-  sudo: yes
+  become: yes
   service:
     name: ocserv
     state: restarted
 
 - name: reload openconnect
-  sudo: yes
+  become: yes
   service:
     name: ocserv
     state: reloaded

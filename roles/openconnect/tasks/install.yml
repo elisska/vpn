@@ -1,7 +1,6 @@
 ---
-
 - name: check epel repository
-  sudo: yes
+  become: yes
   yum:
     pkg: epel-release
     state: present
@@ -9,7 +8,7 @@
     - openconnect
 
 - name: install openconnect
-  sudo: yes
+  become: yes
   yum:
     pkg: ocserv
     state: installed
@@ -17,7 +16,7 @@
     - openconnect
 
 - name: copy systemd unit file
-  sudo: yes
+  become: yes
   template:
     src: ocserv.service.j2
     dest: /usr/lib/systemd/system/ocserv.service

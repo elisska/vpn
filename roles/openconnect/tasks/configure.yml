@@ -32,7 +32,7 @@
   when: not local_server_key.stat.exists or not local_server_cert.stat.exists
 
 - name: generate users and passwords
-  sudo: yes
+  become: yes
   shell: echo -e "{{ item.password }}\n{{ item.password }}" | (ocpasswd -c /etc/ocserv/ocpasswd {{ item.username }})
   with_items:
     - "{{ openconnect_users }}"
@@ -40,7 +40,7 @@
     - openconnect
 
 - name: enable openconnect
-  sudo: yes
+  become: yes
   service:
     name: ocserv
     enabled: yes
@@ -48,7 +48,7 @@
     - openconnect
 
 - name: copy config files
-  sudo: yes
+  become: yes
   template:
     src: ocserv.conf.j2
     dest: "{{ openconnect_conf_file }}"
@@ -60,7 +60,7 @@
     - openconnect
 
 - name: be sure openconnect service is started
-  sudo: yes
+  become: yes
   service:
     name: ocserv 
     state: started
