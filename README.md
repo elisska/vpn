@@ -4,10 +4,20 @@
 
 2. Adjust [roles/openconnect/defaults/main.yml](roles/openconnect/defaults/main.yml) if needed
 
-3. Run playbook:
+3. Generate keys:
+
+```
+ssh-keygen
+cd .ssh/
+cat ~/.ssh/id_rsa.pub >> authorized_keys
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+```
+
+4. Run playbook:
 ```
 ansible-playbook -i hosts playbook.yml
 ```
 
-4. Use *openvpn* or *Cisco AnyConnect* to connect to VPN server
+5. Use *openvpn* or *Cisco AnyConnect* to connect to VPN server
   
